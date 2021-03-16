@@ -1,28 +1,13 @@
 from datetime import datetime
-from pandas_datareader import DataReader
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 # sudo apt-get install python3-tk
-import finnhub
-from pandas_datareader import data
 import matplotlib.pyplot as plt
-import pandas as pd
-import urllib.request, json
-import os
 import numpy as np
-import tensorflow as tf
-from sklearn.preprocessing import MinMaxScaler
-import calendar
-from datetime import datetime, timedelta, timezone
-import time
-import plotly.graph_objects as go
-from sklearn.model_selection import train_test_split
+from pandas_datareader import DataReader
 
-stock_sym='GME'
+stock_sym='CLDR'
 start='2020-12-01'
 # the next line can be High, Low, Open, Close, Volume, Adj Close
-metric_interested='next_7_high'
+metric_interested='next_3_low'
 # Get the stock quote
 df = DataReader(stock_sym, data_source='yahoo', start=start, end=datetime.now())
 # Show teh data
@@ -97,7 +82,7 @@ def get_sentiment_data(stock_name):
     return finnhub_client.news_sentiment(stock_name)
 
 # Get Daily Stock Data for AAPL for the last 30 days
-df = pd.DataFrame.from_dict(get_stock_data('GME', 180, 'D'))
+df = pd.DataFrame.from_dict(get_stock_data(stock_sym, 120, 'D'))
 df['t'] = pd.to_datetime(df['t'], unit = 's')
 # dropping entries where weighted moving average is 0
 # df = df.drop(df[df.wma==0].index)
@@ -140,7 +125,7 @@ def get_line_plot(df, title = "Price vs. Date", x_step = 5):
   plt.title(title)
   return fig
 
-fig = get_line_plot(df, title="Apple Price vs. Date")
+# fig = get_line_plot(df, title="Apple Price vs. Date")
 # plt.draw()
 
 
@@ -279,7 +264,7 @@ print(df.shape)
 
 
 
-metric_interested = 'next_3_high'
+# metric_interested = 'next_3_low'
 
 df[df[metric_interested].eq(0)] = np.nan
 
@@ -348,7 +333,7 @@ model.add(Dense(1))
 model.compile(optimizer='adam', loss='mean_squared_error')
 
 # Train the model
-model.fit(x_train, y_train, batch_size=1, epochs=20)
+model.fit(x_train, y_train, batch_size=1, epochs=50)
 
 
 
