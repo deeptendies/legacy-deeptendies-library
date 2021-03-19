@@ -1,70 +1,49 @@
 # sudo apt-get install python3-tk
-
+from deeptendies.plots import get_candlestick_plot
 from deeptendies.stonks import *
 
 
 
-
 import pandas as pd
+
+# base configs
 stock_sym='GME'
 days_ago=250
 start='2020-12-01'
 metrics_interested=['next_3_high', 'next_3_low']
-df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D'))
-df['t'] = pd.to_datetime(df['t'], unit = 's')
-df
 
-# TODO: save fig and move from local env to mounted drive
+# get df from finnhub
+df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', "c10t49748v6o1us2neqg"))
+df['t'] = pd.to_datetime(df['t'], unit = 's')
+
+# plot something
 fig = get_candlestick_plot(df)
 fig.show()
 
-# fig = get_line_plot(df, title="Apple Price vs. Date")
-# plt.draw()
+# feature engineering, calendar and ma, vwap
+df_proc = get_calendar_features(df)
+df_proc = get_moving_average(df)
+df_proc.fillna(method='backfill')
+df_proc = add_vwap_col(df)
 
-
-"""Date features"""
-
-df_test = get_calendar_features(df)
-df_test
-
-"""Weighted Moving Average"""
-
-df_test = get_moving_average(df)
-df_test
-
-df_test.fillna(method='backfill')
-
-""" Volume weighted average price
-See: https://www.investopedia.com/terms/v/vwap.asp#:~:text=The%20volume%20weighted%20average%20price%20(VWAP)%20is%20a%20trading%20benchmark,and%20value%20of%20a%20security.
-"""
-
-df_test = add_vwap_col(df)
-df_test
-
+# feature engineering, get high and get low
 days=[1,3,5,7]
-
 df_new = get_high(df, days)
 df_new = get_low(df, days)
-
-# print(df.head)
-# print(df.shape)
+print(df.head)
+print(df.shape)
 
 
 for metric_interested in metrics_interested:
     # metric_interested = 'next_3_low'
-
     df[df[metric_interested].eq(0)] = np.nan
-
-
     # plt_visual_raw(stock_sym, metric_interested, df)
-
     # Create a new dataframe with only the 'Close column
     data = df.filter([metric_interested])
     # Convert the dataframe to a numpy array
     dataset = data.values
     # Get the number of rows to train the model on
     training_data_len = int(np.ceil( len(dataset) * .95 ))
-
     # print("training_data_len: %s" %training_data_len )
 
     #scaling
@@ -117,7 +96,6 @@ for metric_interested in metrics_interested:
 
     # Train the model
     model.fit(x_train, y_train, batch_size=1, epochs=20)
-
 
     # Test
     # Create the testing data set

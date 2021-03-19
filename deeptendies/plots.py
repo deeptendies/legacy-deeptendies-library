@@ -1,4 +1,6 @@
+import pandas as pd
 from matplotlib import pyplot as plt
+from plotly import graph_objects as go
 
 
 def get_line_plot(df, title = "Price vs. Date", x_step = 5):
@@ -38,3 +40,19 @@ def plot_predicted(metric_interested, train, valid):
     plt.plot(valid[[metric_interested, 'Predictions']])
     plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
     plt.show()
+
+
+def get_candlestick_plot(df):
+  """Gets candle stick plot from finnhub dataframe assuming typical column header names
+  Params:
+    df to plot from finnhub
+  Returns:
+    plotly graph objects figure
+  """
+  df['t'] = pd.to_datetime(df['t'], unit = 's')
+  fig = go.Figure(data=[go.Candlestick(x=df['t'],
+  open=df['o'],
+  high=df['h'],
+  low=df['l'],
+  close=df['c'])])
+  return fig

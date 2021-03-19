@@ -3,8 +3,6 @@ import time
 
 import finnhub
 import numpy as np
-import pandas as pd
-from plotly import graph_objects as go
 
 
 def x_days_ago(x):
@@ -17,7 +15,7 @@ def days(x):
     return x * 24 * 60 * 60
 
 
-def get_stock_data(stock_name, days, period):
+def get_stock_data(stock_name, days, period, finnhub_api_key):
     '''
       Returns a dictionary of timestamps, closing prices and status response for the given stock symbol
 
@@ -33,7 +31,7 @@ def get_stock_data(stock_name, days, period):
 
     '''
     current_time = calendar.timegm(time.gmtime())  # seconds since Unix epoch
-    finnhub_client = finnhub.Client(api_key="c10t49748v6o1us2neqg")
+    finnhub_client = finnhub.Client(api_key=finnhub_api_key)
     res = finnhub_client.technical_indicator(symbol=stock_name, resolution=period, _from=x_days_ago(days),
                                              to=current_time, indicator='wma',
                                              indicator_fields={"timeperiod": 3})  # wma = weighted moving average
@@ -64,22 +62,6 @@ def get_sentiment_data(stock_name):
 
     finnhub_client = finnhub.Client(api_key="c10t49748v6o1us2neqg")
     return finnhub_client.news_sentiment(stock_name)
-
-
-def get_candlestick_plot(df):
-  """Gets candle stick plot from finnhub dataframe assuming typical column header names
-  Params:
-    df to plot from finnhub
-  Returns:
-    plotly graph objects figure
-  """
-  df['t'] = pd.to_datetime(df['t'], unit = 's')
-  fig = go.Figure(data=[go.Candlestick(x=df['t'],
-  open=df['o'],
-  high=df['h'],
-  low=df['l'],
-  close=df['c'])])
-  return fig
 
 
 def get_day_of_week(date):
