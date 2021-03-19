@@ -1,5 +1,5 @@
 # sudo apt-get install python3-tk
-from deeptendies.plots import get_candlestick_plot
+from deeptendies.plots import *
 from deeptendies.stonks import *
 
 
