@@ -5,10 +5,10 @@ import numpy as np
 from pandas_datareader import DataReader
 
 stock_sym='GME'
-days_ago=240
+days_ago=120
 start='2020-12-01'
 # the next line can be High, Low, Open, Close, Volume, Adj Close
-metrics_interested=['next_7_high', 'next_7_low']
+metrics_interested=['next_3_high', 'next_3_low']
 
 
 # Get the stock quote
@@ -253,6 +253,14 @@ def get_low(df_new, days):
         df_new['last_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(i).fillna(0)
 
 
+def get_exclude_column_names(days):
+    exclude_column_names=[]
+    for i in days:
+        exclude_column_names.append('next_'+str(i)+'_high')
+    return exclude_column_names
+
+
+
 get_high(df, days)
 get_low(df, days)
 
@@ -336,7 +344,7 @@ for metric_interested in metrics_interested:
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     # Train the model
-    model.fit(x_train, y_train, batch_size=1, epochs=100)
+    model.fit(x_train, y_train, batch_size=1, epochs=20)
 
 
 
@@ -361,7 +369,13 @@ for metric_interested in metrics_interested:
 
     # Get the models predicted price values
     predictions = model.predict(x_test)
+
+    print(predictions)
+
     predictions = scaler.inverse_transform(predictions)
+
+    print(predictions)
+
 
     # Get the root mean squared error (RMSE)
     rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
