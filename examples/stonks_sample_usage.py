@@ -1,4 +1,6 @@
 # sudo apt-get install python3-tk
+import re
+
 from deeptendies.plots import *
 from deeptendies.stonks import *
 
@@ -16,20 +18,44 @@ metrics_interested=['next_3_high', 'next_3_low']
 finnhub_token = "c10t49748v6o1us2neqg"
 
 
-# get df from finnhub
-df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', finnhub_token))
-df['t'] = pd.to_datetime(df['t'], unit = 's')
-time.sleep(0.2)
+def merge_dfs(df_left, df_right, col, suffix):
+    # print(pd.merge(left=df_left, right=df_right, left_on='t', right_on='t' + suffix).head())
+    df_merged = pd.merge(left=df_left, right=df_right, left_on=col, right_on=col + suffix)
+    return df_merged
 
+# print(merge_dfs(df, df_dji, suffix).head())
 
 # get dji index
-df_dji = pd.DataFrame.from_dict(get_stock_data("^DJI", days_ago, 'D', finnhub_token))
-df_dji['t'] = pd.to_datetime(df_dji['t'], unit ='s')
+def get_enriched_stock_data(df, stock_name, days, period, finnhub_api_key):
+    # index_sym="^DJI"
+    suffix="_"+re.sub('[^A-Za-z0-9]+', '', stock_name.lower())
+    df_dji = pd.DataFrame.from_dict(get_stock_data(stock_name, days, period, finnhub_api_key))
+    generate_time_fields(df_dji)
+    df_dji = rename_reference_df_column_names(df_dji, suffix)
+    df_merged = merge_dfs(df, df_dji, 'date' , suffix)
+    return df_merged
 
 
-print(df_dji.columns)
-df_dji = rename_reference_df_column_names(df_dji, "_dji")
+def generate_time_fields(df_dji):
+    df_dji['ts'] = pd.to_datetime(df_dji['t'], unit='s')
+    df_dji['date'] = pd.to_datetime(df_dji['t'], unit='s').dt.date
 
+
+
+
+# get df from finnhub
+df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', finnhub_token))
+generate_time_fields(df)
+time.sleep(0.2)
+
+df=get_enriched_stock_data(df, "^DJI", days_ago, 'D', finnhub_token)
+
+
+print(df)
+
+
+
+print(df.head())
 
 exit()
 
