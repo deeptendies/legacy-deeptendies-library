@@ -7,14 +7,31 @@ from deeptendies.stonks import *
 import pandas as pd
 
 # base configs
+from deeptendies.utils import rename_reference_df_column_names
+
 stock_sym='GME'
 days_ago=250
 start='2020-12-01'
 metrics_interested=['next_3_high', 'next_3_low']
+finnhub_token = "c10t49748v6o1us2neqg"
+
 
 # get df from finnhub
-df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', "c10t49748v6o1us2neqg"))
+df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', finnhub_token))
 df['t'] = pd.to_datetime(df['t'], unit = 's')
+time.sleep(0.2)
+
+
+# get dji index
+df_dji = pd.DataFrame.from_dict(get_stock_data("^DJI", days_ago, 'D', finnhub_token))
+df_dji['t'] = pd.to_datetime(df_dji['t'], unit ='s')
+
+
+print(df_dji.columns)
+df_dji = rename_reference_df_column_names(df_dji, "_dji")
+
+
+exit()
 
 # plot something
 fig = get_candlestick_plot(df)
