@@ -1,8 +1,12 @@
 import calendar
+import re
 import time
 
 import finnhub
 import numpy as np
+import pandas as pd
+
+from deeptendies.utils import generate_time_fields, rename_reference_df_column_names, merge_dfs
 
 
 def x_days_ago(x):
@@ -155,3 +159,23 @@ def get_low(df_new, days):
         df_new['last_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(i).fillna(0)
         df_new['last_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(i).fillna(0)
     return df_new
+
+
+def get_enriched_stock_data(df, stock_name, days, period, finnhub_api_key):
+    """
+    combines old df with new data from api call and then merge them together
+
+    :param df: old df
+    :param stock_name: new ticker to call api
+    :param days: same as df's days ago
+    :param period: only supports date for now: D
+    :param finnhub_api_key: api key to make calls
+    :return:
+    """
+    # index_sym="^DJI"
+    suffix="_"+re.sub('[^A-Za-z0-9]+', '', stock_name.lower())
+    df_dji = pd.DataFrame.from_dict(get_stock_data(stock_name, days, period, finnhub_api_key))
+    generate_time_fields(df_dji)
+    df_dji = rename_reference_df_column_names(df_dji, suffix)
+    df_merged = merge_dfs(df, df_dji, 'date', suffix)
+    return df_merged
