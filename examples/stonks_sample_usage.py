@@ -10,10 +10,10 @@ from deeptendies.utils import generate_time_fields
 # just an example, use generated key from https://finnhub.io/dashboard
 # finnhub_token = "c1c318v48v6sp0s58ffg"
 
+credentials='/home/stan/github/mltrade/secrets.yaml'
 # load secrets from yaml example:
-with open('examples/secrets.yaml') as credentials:
+with open(credentials) as credentials:
     credentials = yaml.safe_load(credentials)
-    print(credentials['finnhub-apikey'])
     finnhub_token=credentials['finnhub-apikey']
 
 stock_sym='GME'
@@ -31,8 +31,6 @@ time.sleep(0.2)
 df= get_enriched_stock_data(df, "^DJI", days_ago, 'D', finnhub_token)
 print(df)
 print(df.head())
-
-exit()
 
 # plot something
 # fig = get_candlestick_plot(df)
@@ -67,7 +65,6 @@ for metric_interested in metrics_interested:
     #scaling
     # Scale the data
     from sklearn.preprocessing import MinMaxScaler
-
     scaler = MinMaxScaler(feature_range=(0,1))
     scaled_data = scaler.fit_transform(dataset)
     # scaled_data

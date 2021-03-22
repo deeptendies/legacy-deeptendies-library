@@ -5,3 +5,4 @@ archive/stock_lstm_1.h5
 content/
 venv/
 *.pyc
+secrets.yaml

@@ -99,9 +99,9 @@ def is_quarter_end(date):
 
 
 def get_calendar_features(df):
-    df['day_of_week'] = df.apply(lambda x: get_day_of_week(x.t), axis=1)
-    df['day_of_year'] = df.apply(lambda x: get_day_of_year(x.t), axis=1)
-    df['is_quarter_end'] = df.apply(lambda x: is_quarter_end(x.t), axis=1)
+    df['day_of_week'] = df.apply(lambda x: get_day_of_week(x.ts), axis=1)
+    df['day_of_year'] = df.apply(lambda x: get_day_of_year(x.ts), axis=1)
+    df['is_quarter_end'] = df.apply(lambda x: is_quarter_end(x.ts), axis=1)
     ## TODO: Convert is_quarter_end with to_categorical
 
     return df
