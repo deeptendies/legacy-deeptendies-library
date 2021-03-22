@@ -1,23 +1,25 @@
 # sudo apt-get install python3-tk
-
-from deeptendies.plots import *
+import yaml
 from deeptendies.stonks import *
-
-
-
 import pandas as pd
-
 # base configs
 from deeptendies.stonks import get_enriched_stock_data
 from deeptendies.utils import generate_time_fields
+
+
+# just an example, use generated key from https://finnhub.io/dashboard
+# finnhub_token = "c1c318v48v6sp0s58ffg"
+
+# load secrets from yaml example:
+with open('examples/secrets.yaml') as credentials:
+    credentials = yaml.safe_load(credentials)
+    print(credentials['finnhub-apikey'])
+    finnhub_token=credentials['finnhub-apikey']
 
 stock_sym='GME'
 days_ago=250
 start='2020-12-01'
 metrics_interested=['next_3_high', 'next_3_low']
-finnhub_token = "c10t49748v6o1us2neqg"
-
-
 
 
 # get df from finnhub
@@ -33,8 +35,8 @@ print(df.head())
 exit()
 
 # plot something
-fig = get_candlestick_plot(df)
-fig.show()
+# fig = get_candlestick_plot(df)
+# fig.show()
 
 # feature engineering, calendar and ma, vwap
 df_proc = get_calendar_features(df)
