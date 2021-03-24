@@ -44,43 +44,57 @@ df_proc = add_vwap_col(df)
 
 # feature engineering, get high and get low
 days=[1,3,5,7]
-df_new = get_high(df, days)
-df_new = get_low(df, days)
+df = get_high(df, days)
+df = get_low(df, days)
 print(df.head)
 print(df.shape)
 
 
 for metric_interested in metrics_interested:
+
     # metric_interested = 'next_3_low'
     df[df[metric_interested].eq(0)] = np.nan
+    df.dropna() # drop na so it doesn't skew with the training / testing
+
+
     # plt_visual_raw(stock_sym, metric_interested, df)
     # Create a new dataframe with only the 'Close column
-    data = df.filter([metric_interested])
+    # data = df.filter([metric_interested])
+    xlist = ['h', 'l', 'v']
+    ylist = ['next_3_low']
+    xdata=df.filter(xlist)
+    ydata=df.filter(ylist)
+
+
     # Convert the dataframe to a numpy array
-    dataset = data.values
+    xdataset = xdata.values
+    ydataset = ydata.values
     # Get the number of rows to train the model on
-    training_data_len = int(np.ceil( len(dataset) * .95 ))
+    xtraining_data_len = int(np.ceil( len(xdataset) * .95 ))
+    ytraining_data_len = int(np.ceil( len(ydataset) * .95 ))
     # print("training_data_len: %s" %training_data_len )
 
     #scaling
     # Scale the data
     from sklearn.preprocessing import MinMaxScaler
     scaler = MinMaxScaler(feature_range=(0,1))
-    scaled_data = scaler.fit_transform(dataset)
+    xscaled_data = scaler.fit_transform(xdataset)
+    yscaled_data = scaler.fit_transform(ydataset)
     # scaled_data
     # Create the training data set
     # Create the scaled training data set
-    train_data = scaled_data[0:int(training_data_len), :]
+    xtrain_data = xscaled_data[0:int(xtraining_data_len), :]
+    ytrain_data = yscaled_data[0:int(ytraining_data_len), :]
     # Split the data into x_train and y_train data sets
     x_train = []
     y_train = []
 
 
     # sequence prep
-    look_back = 60
-    for i in range(look_back, len(train_data)):
-        x_train.append(train_data[i - look_back:i, 0])
-        y_train.append(train_data[i, 0])
+    look_back = 15
+    for i in range(look_back, len(xtrain_data)):
+        x_train.append(xtrain_data[i - look_back:i, 0])
+        y_train.append(ytrain_data[i, 0])
         if i <= look_back + 1:
             print(x_train)
             print(y_train)
@@ -121,13 +135,13 @@ for metric_interested in metrics_interested:
     # Create a new array containing scaled values from index 1543 to 2002
 
     # training and validating
-    test_data = scaled_data[training_data_len - 60:, :]
+    xtest_data = xscaled_data[xtraining_data_len - look_back:, :]
 
     # Create the data sets x_test and y_test
     x_test = []
-    y_test = dataset[training_data_len:, :]
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i - 60:i, 0])
+    y_test = ydataset[ytraining_data_len:, :]
+    for i in range(look_back, len(xtest_data)):
+        x_test.append(xtest_data[i - look_back:i, 0])
 
     # Convert the data to a numpy array
     x_test = np.array(x_test)
@@ -150,8 +164,8 @@ for metric_interested in metrics_interested:
 
     ## Plot the data Again
     # Plot the data
-    train = data[:training_data_len]
-    valid = data[training_data_len:]
+    train = ydata[:ytraining_data_len]
+    valid = ydata[ytraining_data_len:]
     valid['Predictions'] = predictions
 
     # plot_predicted()
