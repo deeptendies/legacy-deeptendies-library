@@ -61,7 +61,7 @@ for metric_interested in metrics_interested:
     # Create a new dataframe with only the 'Close column
     # data = df.filter([metric_interested])
     xlist = ['h', 'l', 'v']
-    ylist = ['next_3_low']
+    ylist = [metric_interested]
     xdata=df.filter(xlist)
     ydata=df.filter(ylist)
 
@@ -91,7 +91,7 @@ for metric_interested in metrics_interested:
 
 
     # sequence prep
-    look_back = 15
+    look_back = 25
     for i in range(look_back, len(xtrain_data)):
         x_train.append(xtrain_data[i - look_back:i, 0])
         y_train.append(ytrain_data[i, 0])
@@ -128,7 +128,7 @@ for metric_interested in metrics_interested:
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     # Train the model
-    model.fit(x_train, y_train, batch_size=1, epochs=20)
+    model.fit(x_train, y_train, batch_size=1, epochs=30)
 
     # Test
     # Create the testing data set
