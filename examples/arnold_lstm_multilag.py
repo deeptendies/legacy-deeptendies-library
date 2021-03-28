@@ -18,7 +18,6 @@ from deeptendies.utils import *
 
 fdir, fname = 'temp', 'interm_data.csv'
 file = os.path.join(fdir, fname)
-# df = pd.read_csv(file, header=0, index_col=0)
 
 # copy pasted from https://machinelearningmastery.com/multivariate-time-series-forecasting-lstms-keras/
 # convert series to supervised learning
@@ -72,9 +71,15 @@ print(reframed.shape)
 
 # split into train and test sets
 values = reframed.values
-n_train_hours = 365 * 24
-train = values[:n_train_hours, :]
-test = values[n_train_hours:, :]
+
+
+print(values.size)
+print(values.shape[0])
+print(values.shape[0])
+
+n_train_split = int(0.8 * values.shape[0])
+train = values[:n_train_split, :]
+test = values[n_train_split:, :]
 # split into input and outputs
 n_obs = n_hours * n_features
 train_X, train_y = train[:, :n_obs], train[:, -n_features]
