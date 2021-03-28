@@ -1,45 +1,42 @@
+import os
 import pandas as pd
 import numpy as np
 
-
-file='../temp/interm_data.csv'
+fdir, fname = 'temp', 'interm_data.csv'
+file = os.path.join(fdir, fname)
 df = pd.read_csv(file, header=0, index_col=0)
 
-
-stock_sym='GME'
-days_ago=250
-start='2020-12-01'
-metrics_interested=['next_3_high', 'next_3_low']
-
+stock_sym = 'GME'
+days_ago = 250
+start = '2020-12-01'
+metrics_interested = ['next_3_high', 'next_3_low']
 
 for metric_interested in metrics_interested:
-
     # metric_interested = 'next_3_low'
     df[df[metric_interested].eq(0)] = np.nan
-    df.dropna() # drop na so it doesn't skew with the training / testing
-
+    df.dropna()  # drop na so it doesn't skew with the training / testing
 
     # plt_visual_raw(stock_sym, metric_interested, df)
     # Create a new dataframe with only the 'Close column
     # data = df.filter([metric_interested])
     xlist = ['h', 'l', 'v']
     ylist = [metric_interested]
-    xdata=df.filter(xlist)
-    ydata=df.filter(ylist)
-
+    xdata = df.filter(xlist)
+    ydata = df.filter(ylist)
 
     # Convert the dataframe to a numpy array
     xdataset = xdata.values
     ydataset = ydata.values
     # Get the number of rows to train the model on
-    xtraining_data_len = int(np.ceil( len(xdataset) * .95 ))
-    ytraining_data_len = int(np.ceil( len(ydataset) * .95 ))
+    xtraining_data_len = int(np.ceil(len(xdataset) * .95))
+    ytraining_data_len = int(np.ceil(len(ydataset) * .95))
     # print("training_data_len: %s" %training_data_len )
 
-    #scaling
+    # scaling
     # Scale the data
     from sklearn.preprocessing import MinMaxScaler
-    scaler = MinMaxScaler(feature_range=(0,1))
+
+    scaler = MinMaxScaler(feature_range=(0, 1))
     xscaled_data = scaler.fit_transform(xdataset)
     yscaled_data = scaler.fit_transform(ydataset)
     # scaled_data
@@ -50,8 +47,6 @@ for metric_interested in metrics_interested:
     # Split the data into x_train and y_train data sets
     x_train = []
     y_train = []
-
-
 
 # sequence prep
 look_back = 25
@@ -81,7 +76,8 @@ from keras.layers import Dense, LSTM, Masking
 # Build the LSTM model
 model = Sequential()
 model.add(Masking(mask_value=0., input_shape=(
-x_train.shape[1], 1)))  # handle nans https://stackoverflow.com/questions/52570199/multivariate-lstm-with-missing-values
+    x_train.shape[1],
+    1)))  # handle nans https://stackoverflow.com/questions/52570199/multivariate-lstm-with-missing-values
 model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
 model.add(LSTM(64, return_sequences=False))
 model.add(Dense(25))

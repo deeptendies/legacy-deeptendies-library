@@ -1,6 +1,5 @@
 # sudo apt-get install python3-tk
 import os
-
 import yaml
 from deeptendies.stonks import *
 import pandas as pd
