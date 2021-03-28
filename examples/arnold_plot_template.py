@@ -22,8 +22,6 @@ for key in key_to_search:
     groups += [idx for idx, i in enumerate(df.columns) if key in i]
 print(groups)
 
-exit()
-
 i = 1
 # plot each column
 pyplot.figure()

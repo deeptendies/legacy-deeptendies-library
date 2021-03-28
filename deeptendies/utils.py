@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -42,3 +43,7 @@ def merge_dfs(df_left, df_right, col, suffix):
 def generate_time_fields(df_dji):
     df_dji['ts'] = pd.to_datetime(df_dji['t'], unit='s')
     df_dji['date'] = pd.to_datetime(df_dji['t'], unit='s').dt.date
+
+
+def get_numerical_df(df):
+    return df.select_dtypes(include=np.number)
