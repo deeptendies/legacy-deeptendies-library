@@ -531,7 +531,7 @@ for metric in metrics_interested:
     inputs_data = scaler.transform(inputs_data)
 
     lstm_model.compile(loss='mean_squared_error', optimizer='adam')
-    lstm_model.fit(x_train_data, y_train_data, epochs=10, batch_size=1, verbose=1)
+    lstm_model.fit(x_train_data, y_train_data, epochs=20, batch_size=32, verbose=1)
 
     lstm_model.summary()
 
@@ -565,3 +565,7 @@ for metric in metrics_interested:
     # visualize_result()
 
     print(valid_df[metric+'_predictions'])
+
+
+
+# grid search for this is needed https://machinelearningmastery.com/how-to-grid-search-deep-learning-models-for-time-series-forecasting/
