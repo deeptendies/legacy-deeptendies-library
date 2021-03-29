@@ -46,4 +46,4 @@ def generate_time_fields(df_dji):
 
 
 def get_numerical_df(df):
-    return df.select_dtypes(include=np.number)
+    return df.select_dtypes(include=np.number).reindex()

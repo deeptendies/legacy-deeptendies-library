@@ -47,7 +47,6 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 
 # load dataset
 df = read_csv(file, header=0, index_col=0)
-
 df = get_numerical_df(df)
 
 # drop column if not numerical
@@ -63,31 +62,30 @@ values = values.astype('float32')
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled = scaler.fit_transform(values)
 # specify the number of lag hours
-n_hours = 3
+steps = 3
 n_features = 8
 # frame as supervised learning
-reframed = series_to_supervised(scaled, n_hours, 1)
-print(reframed.shape)
+reframed = series_to_supervised(scaled, steps, 1)
+print("reframed shape %s" % str(reframed.shape))
 
 # split into train and test sets
 values = reframed.values
 
 
-print(values.size)
-print(values.shape[0])
-print(values.shape[0])
+print("values size %s" %values.size)
+print("values shape %s" % str(values.shape))
 
 n_train_split = int(0.8 * values.shape[0])
 train = values[:n_train_split, :]
 test = values[n_train_split:, :]
 # split into input and outputs
-n_obs = n_hours * n_features
+n_obs = steps * n_features
 train_X, train_y = train[:, :n_obs], train[:, -n_features]
 test_X, test_y = test[:, :n_obs], test[:, -n_features]
 print(train_X.shape, len(train_X), train_y.shape)
 # reshape input to be 3D [samples, timesteps, features]
-train_X = train_X.reshape((train_X.shape[0], n_hours, n_features))
-test_X = test_X.reshape((test_X.shape[0], n_hours, n_features))
+train_X = train_X.reshape((train_X.shape[0], steps, n_features))
+test_X = test_X.reshape((test_X.shape[0], steps, n_features))
 print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
 # design network
@@ -96,7 +94,7 @@ model.add(LSTM(50, input_shape=(train_X.shape[1], train_X.shape[2])))
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 # fit network
-history = model.fit(train_X, train_y, epochs=50, batch_size=72, validation_data=(test_X, test_y), verbose=2,
+history = model.fit(train_X, train_y, epochs=2, batch_size=72, validation_data=(test_X, test_y), verbose=2,
                     shuffle=False)
 # plot history
 pyplot.plot(history.history['loss'], label='train')
@@ -106,16 +104,18 @@ pyplot.show()
 
 # make a prediction
 yhat = model.predict(test_X)
-test_X = test_X.reshape((test_X.shape[0], n_hours * n_features))
+test_X = test_X.reshape((test_X.shape[0], steps * n_features))
 # invert scaling for forecast
-inv_yhat = concatenate((yhat, test_X[:, -7:]), axis=1)
+inv_yhat = concatenate((yhat, test_X[:, -(n_features-1):]), axis=1)
 inv_yhat = scaler.inverse_transform(inv_yhat)
 inv_yhat = inv_yhat[:, 0]
 # invert scaling for actual
 test_y = test_y.reshape((len(test_y), 1))
-inv_y = concatenate((test_y, test_X[:, -7:]), axis=1)
+inv_y = concatenate((test_y, test_X[:, -(n_features-1):]), axis=1)
 inv_y = scaler.inverse_transform(inv_y)
 inv_y = inv_y[:, 0]
 # calculate RMSE
 rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
 print('Test RMSE: %.3f' % rmse)
+
+# https://datascience.stackexchange.com/questions/22488/value-error-operands-could-not-be-broadcast-together-with-shapes-lstm
