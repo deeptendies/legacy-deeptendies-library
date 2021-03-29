@@ -1,5 +1,6 @@
 # !pip install -r https://gist.githubusercontent.com/stancsz/c9fb51930b4ad40e5d13e502deaebaec/raw/281fad49b22327d0c717f0784a72b16a08f1bbd8/requirements.txt
 # to minify  pyminifier arnold_lstm_eval1.py >> temp.py
+# source ref https://www.kaggle.com/saurabhshahane/stock-prices-predictions-eda-lstm-deepexploration#Predictions
 # -*- coding: utf-8 -*-
 """
 #### Libraries
@@ -531,7 +532,7 @@ for metric in metrics_interested:
     inputs_data = scaler.transform(inputs_data)
 
     lstm_model.compile(loss='mean_squared_error', optimizer='adam')
-    lstm_model.fit(x_train_data, y_train_data, epochs=20, batch_size=32, verbose=1)
+    lstm_model.fit(x_train_data, y_train_data, epochs=30, batch_size=7, verbose=1)
 
     lstm_model.summary()
 
