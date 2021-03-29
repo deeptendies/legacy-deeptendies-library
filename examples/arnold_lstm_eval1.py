@@ -1,4 +1,5 @@
 # !pip install -r https://gist.githubusercontent.com/stancsz/c9fb51930b4ad40e5d13e502deaebaec/raw/281fad49b22327d0c717f0784a72b16a08f1bbd8/requirements.txt
+# to minify  pyminifier arnold_lstm_eval1.py >> temp.py
 # -*- coding: utf-8 -*-
 """
 #### Libraries
@@ -486,7 +487,7 @@ for metric in metrics_interested:
     scaler = MinMaxScaler(feature_range=(0, 1))
     final_dataset = new_df.values
 
-    test_train_split = int(final_dataset.shape[0] * 0.95)
+    test_train_split = int(final_dataset.shape[0] * 0.9)
 
     train_data = final_dataset[0:test_train_split, ]
     valid_data = final_dataset[test_train_split:, ]
@@ -530,7 +531,7 @@ for metric in metrics_interested:
     inputs_data = scaler.transform(inputs_data)
 
     lstm_model.compile(loss='mean_squared_error', optimizer='adam')
-    lstm_model.fit(x_train_data, y_train_data, epochs=10, batch_size=1, verbose=2)
+    lstm_model.fit(x_train_data, y_train_data, epochs=10, batch_size=1, verbose=1)
 
     lstm_model.summary()
 
