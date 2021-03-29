@@ -75,7 +75,7 @@ values = reframed.values
 print("values size %s" %values.size)
 print("values shape %s" % str(values.shape))
 
-n_train_split = int(0.8 * values.shape[0])
+n_train_split = int(0.8 * values.shape[1])
 train = values[:n_train_split, :]
 test = values[n_train_split:, :]
 # split into input and outputs
