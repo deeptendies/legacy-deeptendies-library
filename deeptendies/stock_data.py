@@ -4,8 +4,9 @@ Part of the deeptendies stock sequence modelling package.
 
   Typical usage: 
   foo = StockData("GME")
-  df = foo.getDf()
-  etc
+  df = foo.get_df()
+  df = foo.engineer_features()
+  df = foo.get_cleaned_data()
 """
 import re
 import finnhub
@@ -42,8 +43,52 @@ class StockData():
     """
     self.api_key = self.get_api_key("secrets.yaml")
     self.df = self.get_stock_data(ticker, days, period)
+
+  def get_df(self): 
+    return self.df
+
+  def drop_cols(self, cols=[None]): 
+    """Drop requested cols from self.df
+    """
+    for col in cols: 
+      self.df = self.df.drop(columns(cols))
+
+  def get_cleaned_data(self,  categorical_cols=["is_quarter_end"], index_col="t", drop_cols=['s', 'wma'], imputation_strategy='drop'):
+    """Converts dataframe to np.arr tensor ready to use in tf functions
+    Params: 
+      df: Pandas df to convert, expecting typical finnhub formated col names
+      categorical_cols: column names to convert to categorical data
+      index_col: column name to reindex to
+      drop_cols:  column names to drop. 
+      imputation_strategy: method  for imputation {‘backfill’, ‘bfill’, ‘pad’, ‘ffill’, drop}. drop means drop the rows. 
+    Returns:
+      numpy array 
+    """
+    df = self.df
+    df = df.drop(columns=drop_cols)
+    df = df.set_index(keys=index_col)
+    for col in categorical_cols: 
+      # NOTE: this should be a applymap for speed, but this is fine for short amounts of columns
+      df[col] = df[col].astype('int32')
+    if imputation_strategy == 'drop': 
+      df=df.dropna()
+    else: 
+      df = df.fillna(method=imputation_strategy)
+      ## TODO: Split into X,y?
+    return df
+
+  def engineer_features(self, windows=[100, 50, 20], days=[1, 3, 5, 7]): 
+    """Perform all feature engineering steps
+      Args: 
+        windows <list <int>>: windows to consider for mwa and mvwap
+        days <list <int>>: Days to consider for high/low prices. 
+    """
     self.df = self.get_calendar_features(self.df)
-    
+    for window in windows: 
+      self.df = self.get_moving_average(self.df, col='c', window=window)
+      self.df = self.add_mvwap_col(self.df, window=window)
+    self.df = self.get_high(self.df, days)
+    self.df = self.get_low(self.df, days)
 
   def get_api_key(self, fname): 
     """OS agnostic api key fetcher. 
@@ -85,13 +130,12 @@ class StockData():
       res = finnhub_client.technical_indicator(symbol=stock_name, resolution=period, _from=self.x_days_ago(days),
                                               to=current_time, indicator='wma',
                                               indicator_fields={"timeperiod": 3})  # wma = weighted moving average
-
       if res['s'] == 'ok':
         df = pd.DataFrame.from_dict(res)
         df['t'] = pd.to_datetime(df['t'], unit='s')
         return df
       else:
-          raise Exception(f'No data found for ticker {stock_name}, days {days}, period {period}! Aborting StockData init')
+          raise Exception(f'No data found for ticker = {stock_name}, days = {days}, period = {period}! Aborting StockData init')
 
 
   def get_sentiment_data(self, stock_name):
@@ -148,12 +192,10 @@ class StockData():
 
 
   def get_calendar_features(self, df):
-      # print(df.iloc[0])
-      # print(self.get_day_of_week())
       df['day_of_week'] = df.apply(lambda x: self.get_day_of_week(x.t), axis=1)
       df['day_of_year'] = df.apply(lambda x: self.get_day_of_year(x.t), axis=1)
       df['is_quarter_end'] = df.apply(lambda x: self.is_quarter_end(x.t), axis=1)
-      # TODO: Convert is_quarter_end with to_categorical
+      # TODO: Convert is_quarter_end with to_categorical?
 
       return df
 
@@ -179,22 +221,17 @@ class StockData():
     return df
 
 
-  def get_vwap(self, row):
-    """To be used in lambda function for row-wise calc
-    """
-    average_price = (row.h + row.l + row.c) / 3
-    wvap = average_price / row.v
-    return wvap
-
-
-  def add_vwap_col(self, df):
-    """Add volume weighted average price to df
-    Params:
-      df: df to add vwap to. Expeting col names "h", "l", "c" for calc
-    Returns
+  def add_mvwap_col(self, df, window=100): 
+    """Add moving volume weighted average price to df between window periods 
+    Params: 
+      df: df to add vwap to. Expecting col names "h", "l", "c" for calc
+      window <int>: window to consider (days)
+    Returns 
       df with new col named "vwap"
     """
-    df['vwap'] = df.apply(lambda row: get_vwap(row), axis=1)
+    avgPriceVol = df.apply(lambda x: (x.c + x.h + x.l) * x.v/3, axis=1)
+    col_name = str(window) + "mvwap"
+    df[col_name] = avgPriceVol.rolling(window, center=False, min_periods=1).sum() / df.v.rolling(window, center=False, min_periods=1).sum()
     return df
 
 
@@ -213,6 +250,7 @@ class StockData():
 
 
   def get_enriched_stock_data(self, df, stock_name, days, period, finnhub_api_key):
+    # TODO: Incorporate into class. Talk to stan about goals here (reimport, re-feature engineer?)
       """
       combines old df with new data from api call and then merge them together
 
@@ -231,6 +269,77 @@ class StockData():
       df_merged = merge_dfs(df, df_dji, 'date', suffix)
       return df_merged
 
+  def get_train_test_split(self, df, test_percentage=0.3): 
+    """Helper to get test_train percentages
+    """
+    train_idx = np.int(len(df)*(1-test_percentage))
+    return train_idx, len(df) - train_idx
+
+  def get_timeseries_generators(self, df=None, test_percentage=0.3, target_col="c", length = 100, batch_size=1): 
+    """Get train/test generators
+
+      Similar to: https://jackdry.com/using-an-lstm-based-model-to-predict-stock-returns
+
+      Args: 
+        df = df to get generators for, typically self.df
+        test_percentage = percentage of set to hold back 
+        target_col = name of column for target
+        length = rolling window length to consider (eg., 100 days)
+        batch_size = batch size for generator
+      
+      Returns: 
+        (trainGen, testGen) = tf.keras.preprocessing.sequence.TimeseriesGenerator objects, one for training, one for testing. 
+    """
+    if df == None: 
+      df = self.df
+    train_idx, test_idx = self.get_train_test_split(df, test_percentage)
+    trainGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
+        df.values, 
+        df[target_col].values,
+        length=length, 
+        batch_size=batch_size,
+        start_index =0,
+        end_index = train_idx-1
+    )
+
+    testGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
+        df.values, 
+        df[target_col].values,
+        length=length, 
+        batch_size=batch_size,
+        start_index =train_idx
+    )
+    return trainGen, testGen
+
+  def get_line_plot(self, df=None, title = "Closing Price vs. Date", x_step = 365, plot_features=True):
+      """Gets line plot for a standard finnhub df
+      Params: 
+      df: df to plot
+      title: name of plot
+      x_step: number of time steps to print on x axis (ie., x_steps per tick). Note that buisness days only ploted! 
+      plot_features <bool>: true if you want to see the mva and mvwap overlaid
+      Returns:
+      plt.fig instance
+      """
+      if df == None: 
+        df = self.df
+      fig, ax = plt.subplots(figsize=(24,18))
+      ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
+      if plot_features: 
+          features = ['100wma', '100mvwap', '50wma', '50mvwap', '20wma', '20mvwap']
+          colors = ['firebrick', 'navy', 'red', 'blue', 'salmon', 'cornflowerblue']
+          for feature, color in zip(features, colors): 
+              ax.plot(range(df.shape[0]), df[feature].values, label=feature, c=color)
+      plt.xticks(range(0,df.shape[0],x_step),df.index[::x_step],rotation=45)
+      plt.xlabel('Date',fontsize=24)
+      plt.ylabel('Mid Price',fontsize=24)
+      plt.title(title, fontsize=36)
+      leg = plt.legend()
+      return fig
+
+
 
 if __name__ == '__main__':
   test = StockData('GME') 
+  test.engineer_features()
+  test.get_cleaned_data()
