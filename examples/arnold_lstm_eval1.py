@@ -252,7 +252,7 @@ finnhub_token = 'c1c3f6v48v6sp0s58o20'
 stock_sym = 'GME'
 days_ago = 250
 start = '2020-12-01'
-metrics_interested = ['next_3_high', 'next_3_low']
+metrics_interested = ['next_1_high', 'next_1_low', 'next_3_high', 'next_3_low', 'next_7_high', 'next_7_low']
 
 # get df from finnhub
 df = pd.DataFrame.from_dict(get_stock_data(stock_sym, days_ago, 'D', finnhub_token))
@@ -435,6 +435,7 @@ def visualize_result():
     """## HEATMAP"""
     rnn_heatmap(lstm_model, 'lstm')
 
+result_df=pd.DataFrame()
 
 for metric in metrics_interested:
     """## Dataset"""
@@ -488,7 +489,7 @@ for metric in metrics_interested:
     scaler = MinMaxScaler(feature_range=(0, 1))
     final_dataset = new_df.values
 
-    test_train_split = int(final_dataset.shape[0] * 0.9)
+    test_train_split = int(final_dataset.shape[0] -3 )
 
     train_data = final_dataset[0:test_train_split, ]
     valid_data = final_dataset[test_train_split:, ]
@@ -566,7 +567,9 @@ for metric in metrics_interested:
     # visualize_result()
 
     print(valid_df[metric+'_predictions'])
+    result_df[stock_sym+'_'+metric+'_predictions']= valid_df[metric+'_predictions']
 
+print(result_df)
 
 
 # grid search for this is needed https://machinelearningmastery.com/how-to-grid-search-deep-learning-models-for-time-series-forecasting/
