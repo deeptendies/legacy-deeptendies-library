@@ -13,6 +13,7 @@ import finnhub
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 import tensorflow as tf 
 from sklearn.preprocessing import MinMaxScaler
@@ -41,6 +42,7 @@ class StockData():
         days (int): Number of days to collect data for (going back from today)
         period (string): Options are by minute: ('1' , '5', '15', '30', '60') and by day/week/month ('D', 'W', 'M')
     """
+    self.ticker = ticker
     self.api_key = self.get_api_key("secrets.yaml")
     self.df = self.get_stock_data(ticker, days, period)
 
@@ -51,7 +53,7 @@ class StockData():
     """Drop requested cols from self.df
     """
     for col in cols: 
-      self.df = self.df.drop(columns(cols))
+      self.df = self.df.drop(columns=cols)
 
   def get_cleaned_data(self,  categorical_cols=["is_quarter_end"], index_col="t", drop_cols=['s', 'wma'], imputation_strategy='drop'):
     """Converts dataframe to np.arr tensor ready to use in tf functions
@@ -219,7 +221,7 @@ class StockData():
     sum_weights = np.sum(weights)
     col_name = str(window) + "wma"
 
-    df[col_name] = (df[col].rolling(window=window, center=False, min_periods=1).apply(lambda x: np.sum(weights*x) / sum_weights, raw=False))
+    df[col_name] = (df[col].rolling(window=window, center=False).apply(lambda x: np.sum(weights*x) / sum_weights, raw=False))
     return df
 
 
@@ -271,14 +273,17 @@ class StockData():
       df_merged = merge_dfs(df, df_dji, 'date', suffix)
       return df_merged
 
-  def get_correlation_to_tickers(self, tickers=None, days=365, period = 'D'): 
+  def get_closing_correlation_heatmap(self, tickers=None, days=365, period = 'D'): 
     dfs= {}
     for ticker in tickers: 
       dfs[ticker] = pd.DataFrame.from_dict(self.get_stock_data(ticker, days, period))
     merged_df = self.df.c.to_frame()
     for ticker in dfs: 
       merged_df = merged_df.join(dfs[ticker].c, lsuffix="-" + ticker )
-    return merged_df
+    merged_df = merged_df.rename(columns={"c": "c-" + self.ticker})
+    static_corrs = merged_df.corr(method='spearman')
+    ax = sns.heatmap(static_corrs)
+    return ax
 
   def get_train_test_split(self, df, test_percentage=0.3): 
     """Helper to get test_train percentages
