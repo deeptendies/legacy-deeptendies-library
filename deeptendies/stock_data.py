@@ -72,6 +72,8 @@ class StockData():
       df[col] = df[col].astype('int32')
     if imputation_strategy == 'drop': 
       df=df.dropna()
+    elif imputation_strategy==None: 
+      return df
     else: 
       df = df.fillna(method=imputation_strategy)
       ## TODO: Split into X,y?
@@ -217,7 +219,7 @@ class StockData():
     sum_weights = np.sum(weights)
     col_name = str(window) + "wma"
 
-    df[col_name] = (df[col].rolling(window=window, center=False).apply(lambda x: np.sum(weights*x) / sum_weights, raw=False))
+    df[col_name] = (df[col].rolling(window=window, center=False, min_periods=1).apply(lambda x: np.sum(weights*x) / sum_weights, raw=False))
     return df
 
 
@@ -237,15 +239,15 @@ class StockData():
 
   def get_high(self, df_new, days):
       for i in days:
-          df_new['next_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(-i).fillna(0)
-          df_new['next_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(-i).fillna(0)
+          df_new['next_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(-i).fillna(np.nan) #TODO: Try out other imputation method
+          df_new['next_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(-i).fillna(np.nan) 
       return df_new
 
 
   def get_low(self, df_new, days):
       for i in days:
-          df_new['last_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(i).fillna(0)
-          df_new['last_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(i).fillna(0)
+          df_new['last_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(i).fillna(np.nan)
+          df_new['last_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(i).fillna(np.nan)
       return df_new
 
 
@@ -263,11 +265,20 @@ class StockData():
       """
       # index_sym="^DJI"
       suffix="_"+re.sub('[^A-Za-z0-9]+', '', stock_name.lower())
-      df_dji = pd.DataFrame.from_dict(get_stock_data(stock_name, days, period, finnhub_api_key))
+      df_dji = pd.DataFrame.from_dict(self.get_stock_data(stock_name, days, period, finnhub_api_key))
       generate_time_fields(df_dji)
       df_dji = rename_reference_df_column_names(df_dji, suffix)
       df_merged = merge_dfs(df, df_dji, 'date', suffix)
       return df_merged
+
+  def get_correlation_to_tickers(self, tickers=None, days=365, period = 'D'): 
+    dfs= {}
+    for ticker in tickers: 
+      dfs[ticker] = pd.DataFrame.from_dict(self.get_stock_data(ticker, days, period))
+    merged_df = self.df.c.to_frame()
+    for ticker in dfs: 
+      merged_df = merged_df.join(dfs[ticker].c, lsuffix="-" + ticker )
+    return merged_df
 
   def get_train_test_split(self, df, test_percentage=0.3): 
     """Helper to get test_train percentages
