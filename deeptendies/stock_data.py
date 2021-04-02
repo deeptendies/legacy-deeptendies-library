@@ -34,7 +34,7 @@ class StockData():
   Combines api call, preprocessing, and feature engineering into one, deep fucking value package. 
   """
 
-  def __init__(self, ticker, days=7300, period='D'): 
+  def __init__(self, ticker, days=7300, period='D', api_key=None): 
     """Instantiates new StockData object.
     
       Args: 
@@ -43,7 +43,10 @@ class StockData():
         period (string): Options are by minute: ('1' , '5', '15', '30', '60') and by day/week/month ('D', 'W', 'M')
     """
     self.ticker = ticker
-    self.api_key = self.get_api_key("secrets.yaml")
+    if api_key == None: 
+      self.api_key = self.get_api_key("secrets.yaml")
+    else: 
+      self.api_key = api_key
     self.df = self.get_stock_data(ticker, days, period)
 
   def get_df(self): 
