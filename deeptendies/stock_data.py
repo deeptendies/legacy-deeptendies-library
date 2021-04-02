@@ -287,14 +287,15 @@ class StockData():
     static_corrs = merged_df.corr(method='spearman')
     ax = sns.heatmap(static_corrs)
     return ax
-
-  def get_train_test_split(self, df, test_percentage=0.3): 
+  @staticmethod
+  def get_train_test_split(df, test_percentage=0.3): 
     """Helper to get test_train percentages
     """
     train_idx = np.int(len(df)*(1-test_percentage))
     return train_idx, len(df) - train_idx
 
-  def get_timeseries_generators(self, df=None, test_percentage=0.3, target_col="c", length = 100, batch_size=1): 
+  @staticmethod
+  def get_timeseries_generators(df, test_percentage=0.3, target_col="c", length = 100, batch_size=1): 
     """Get train/test generators
 
       Similar to: https://jackdry.com/using-an-lstm-based-model-to-predict-stock-returns
@@ -309,9 +310,8 @@ class StockData():
       Returns: 
         (trainGen, testGen) = tf.keras.preprocessing.sequence.TimeseriesGenerator objects, one for training, one for testing. 
     """
-    if df == None: 
-      df = self.df
-    train_idx, test_idx = self.get_train_test_split(df, test_percentage)
+    train_idx, test_idx = StockData.get_train_test_split(df, test_percentage)
+    print(train_idx, test_idx)
     trainGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
         df.values, 
         df[target_col].values,
