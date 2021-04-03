@@ -84,6 +84,11 @@ class StockData():
       ## TODO: Split into X,y?
     return df
 
+
+  def reorder_cols(self, cols=[]):
+    self.df = self.df.loc[:, cols]
+    return self.df
+
   def engineer_features(self, windows=[100, 50, 20], days=[1, 3, 5, 7]): 
     """Perform all feature engineering steps
       Args: 
@@ -287,6 +292,30 @@ class StockData():
     static_corrs = merged_df.corr(method='spearman')
     ax = sns.heatmap(static_corrs)
     return ax
+
+
+  def get_scaled_df(self, df, test_percentage=0.3, ignore_cols=['day_of_week', 'day_of_year', 'is_quarter_end'], target_col = 'c'):
+      train_idx, _  = StockData.get_train_test_split(df, test_percentage)
+      scaler = MinMaxScaler()
+      target_scaler = MinMaxScaler()
+      cols = list(set(df.columns) - set(ignore_cols))
+      train_df = df[:train_idx]
+      target_scaler.fit(train_df[target_col].to_numpy().reshape(-1,1))
+      scaler.fit(train_df[cols])
+      df[cols] = scaler.transform(df[cols])
+      self.scaler = scaler
+      self.target_scaler = target_scaler
+      return df
+
+  def inverse_transform_target_vector(self, y): 
+      if type(y) == pd.core.series.Series: 
+          y = y.to_numpy()
+      if len(y.shape) == 0 : 
+          y = y.reshape(1,-1)
+      elif len(y.shape) == 1: 
+          y = y.reshape(-1, 1)
+      return self.target_scaler.inverse_transform(y)
+    
   @staticmethod
   def get_train_test_split(df, test_percentage=0.3): 
     """Helper to get test_train percentages
