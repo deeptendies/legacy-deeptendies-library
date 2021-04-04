@@ -1,12 +1,18 @@
+# caches
+content/
 venv/
 .idea/
 .ipynb_checkpoints/
 __pycache__/
+*.pyc
 
+# dist
 dist/
 build/
 
-content/
-
-*.pyc
+# secrets
 secrets.yaml
+
+# local bucket / storage
+*bucket=*
+*temp/
