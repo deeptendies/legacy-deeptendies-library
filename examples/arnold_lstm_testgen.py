@@ -1,18 +1,14 @@
 import os
 import pandas as pd
 import numpy as np
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 # %matplotlib inline
 import warnings
 
 from sklearn.preprocessing import MinMaxScaler
 
-from deeptendies.utils import get_numerical_df
+from src.deeptendies import get_numerical_df
 
 warnings.filterwarnings('ignore')
-import tensorflow as tf
 from tensorflow.keras.preprocessing.sequence import TimeseriesGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense

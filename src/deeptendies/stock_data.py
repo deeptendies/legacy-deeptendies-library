@@ -106,7 +106,7 @@ class StockData():
     """OS agnostic api key fetcher. 
     Place secrets.yaml in outer dir
     """
-    fpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", fname))
+    fpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", fname))
     with open(fpath) as f: 
         credentials = yaml.safe_load(f)
         return credentials['finnhub-apikey']
