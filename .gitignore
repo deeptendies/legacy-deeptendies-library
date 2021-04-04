@@ -1,8 +1,14 @@
+venv/
 .idea/
 .ipynb_checkpoints/
 __pycache__/
-archive/stock_lstm_1.h5
+
+dist/
+build/
+deeptendies.egg-info/
+deeptendies/deeptendies.egg-info/
+
 content/
-venv/
+
 *.pyc
 secrets.yaml

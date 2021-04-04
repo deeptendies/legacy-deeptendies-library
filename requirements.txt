@@ -1,0 +1,15 @@
+pandas
+matplotlib
+seaborn
+pandas_datareader
+sklearn
+numpy
+keras
+tensorflow
+plotly
+finnhub-python
+statsmodels
+autokeras
+
+# can be depreciated
+see_rnn
