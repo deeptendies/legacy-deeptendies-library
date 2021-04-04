@@ -1,11 +1,11 @@
 # sudo apt-get install python3-tk
 import os
 import yaml
-from src.deeptendies.stonks import *
+from deeptendies.stonks import *
 import pandas as pd
 # base configs
-from src.deeptendies.stonks import get_enriched_stock_data
-from src.deeptendies import generate_time_fields
+from deeptendies.stonks import get_enriched_stock_data
+from deeptendies.utils import generate_time_fields
 
 
 # just an example, use generated key from https://finnhub.io/dashboard

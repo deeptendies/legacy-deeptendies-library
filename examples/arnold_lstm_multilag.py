@@ -1,5 +1,7 @@
 import os
 from math import sqrt
+
+from deeptendies.utils import get_numerical_df
 from numpy import concatenate
 from matplotlib import pyplot
 from pandas import read_csv
