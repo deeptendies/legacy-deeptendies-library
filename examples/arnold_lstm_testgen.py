@@ -4,9 +4,9 @@ import numpy as np
 # %matplotlib inline
 import warnings
 
+from deeptendies.utils import get_numerical_df
 from sklearn.preprocessing import MinMaxScaler
 
-from src.deeptendies import get_numerical_df
 
 warnings.filterwarnings('ignore')
 from tensorflow.keras.preprocessing.sequence import TimeseriesGenerator
