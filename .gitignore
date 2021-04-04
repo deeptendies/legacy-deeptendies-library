@@ -16,3 +16,4 @@ secrets.yaml
 # local bucket / storage
 *bucket=*
 *temp/
+/examples/arnold/time_series_forecaster/

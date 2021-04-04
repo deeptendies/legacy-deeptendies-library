@@ -2,7 +2,6 @@
 pip install autokeras
 """
 import os
-
 from deeptendies.utils import get_numerical_df
 
 """

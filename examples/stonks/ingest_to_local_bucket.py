@@ -20,6 +20,7 @@ def df_to_filesys_operator(df, path, fname):
     if not os.path.exists(path):
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)
     df.to_csv(os.path.join(path, fname))
+    return
 
 
 bucket = 'bucket=filesys'
