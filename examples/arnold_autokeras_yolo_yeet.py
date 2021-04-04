@@ -3,7 +3,7 @@ pip install autokeras
 """
 import os
 
-from deeptendies.utils import get_numerical_df
+from src.deeptendies import get_numerical_df
 
 """
 To make this tutorial easy to follow, we use the UCI Airquality dataset, and try to
@@ -15,9 +15,6 @@ The first step is to prepare your data. Here we use the [UCI Airquality dataset]
 """
 
 import pandas as pd
-import tensorflow as tf
-
-
 
 fdir, fname = 'temp', 'interm_data.csv'
 file = os.path.join(fdir, fname)

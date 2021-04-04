@@ -3,16 +3,22 @@ currently deeptendies is an open source package to get stonks data. Enrich via g
 
 # Installation
 ## mac & linux
-fresh install
 ```
-git clone https://github.com/deeptendies/deeptendies.git && cd deeptendies && python setup.py install
+# install dependencies
+pip install -r https://raw.githubusercontent.com/deeptendies/deeptendies/master/requirements.txt
+# install deeptendies
+pip install git+https://github.com/deeptendies/deeptendies
 ```
-experimental (not working atm)
+one line
 ```
-pip install git+https://github.com/deeptendies/deeptendies#egg=deeptendies
+pip install -r https://raw.githubusercontent.com/deeptendies/deeptendies/master/requirements.txt && pip install git+https://github.com/deeptendies/deeptendies
 ```
-get updates
+
+## windows
 ```
-pip uninstall -y deeptendies && python setup.py install
+git clone https://github.com/deeptendies/deeptendies.git
+cd deeptendies
+python setup.py install
 ```
+
 

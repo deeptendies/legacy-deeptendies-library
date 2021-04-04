@@ -6,7 +6,7 @@ import finnhub
 import numpy as np
 import pandas as pd
 
-from deeptendies.utils import generate_time_fields, rename_reference_df_column_names, merge_dfs
+from src.deeptendies import generate_time_fields, rename_reference_df_column_names, merge_dfs
 
 
 def x_days_ago(x):

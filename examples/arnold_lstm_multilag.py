@@ -11,7 +11,6 @@ from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
-from deeptendies.utils import *
 
 # to get started developing your own arnold, clone this starter file, rename
 # it as a new file, following mike's naming convention arnold_<model name>_<extra tag>.py
