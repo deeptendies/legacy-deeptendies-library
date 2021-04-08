@@ -1,5 +1,6 @@
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import numpy as np 
+import json 
 
 class WindowNormTimeseriesGenerator(tf.keras.preprocessing.sequence.TimeseriesGenerator):
     """Extended from the keras TimeSeriesGenerator to add windowed normalization
