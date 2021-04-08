@@ -14,6 +14,11 @@ one line
 pip install -r https://raw.githubusercontent.com/deeptendies/deeptendies/master/requirements.txt && pip install git+https://github.com/deeptendies/deeptendies
 ```
 
+reinstall
+```
+pip uninstall deeptendies && pip install git+https://github.com/deeptendies/deeptendies
+```
+
 ## windows
 ```
 git clone https://github.com/deeptendies/deeptendies.git
