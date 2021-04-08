@@ -24,7 +24,7 @@ import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 import yaml 
 import os
-from src.deeptendies.window_norm_timeseries_generator import WindowNormTimeseriesGenerator
+from deeptendies.window_norm_timeseries_generator import WindowNormTimeseriesGenerator
 
 # from deeptendies.utils import generate_time_fields, rename_reference_df_column_names, merge_dfs
 
