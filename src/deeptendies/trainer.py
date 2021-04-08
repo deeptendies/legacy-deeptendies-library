@@ -6,7 +6,6 @@ import os
 import shutil	
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 from tensorflow.keras.layers.experimental.preprocessing import Normalization
-# from google.colab import drive
 
 
 class Trainer():
@@ -40,8 +39,9 @@ class Trainer():
         plt.ylabel("Accuracy")
         fig.show()
 
-    def save_model(self):
-        # drive.mount('/content/drive')
+    def save_model_collab(self):
+        """INTENDED FOR COLLAB ONLY"""
+        drive.mount('/content/drive')
         self.model.save(self.model_name) 
         os.listdir()
         for f in os.listdir(): 
@@ -49,3 +49,6 @@ class Trainer():
                 continue
             if f.split(".")[1] =="h5":
                 shutil.copyfile(f, self.dir_location + f)
+
+    def save_model_local(self): 
+        pass 
