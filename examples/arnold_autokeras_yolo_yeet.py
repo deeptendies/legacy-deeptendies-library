@@ -2,8 +2,7 @@
 pip install autokeras
 """
 import os
-
-from src.deeptendies.utils import get_numerical_df
+from deeptendies.utils import get_numerical_df
 
 """
 To make this tutorial easy to follow, we use the UCI Airquality dataset, and try to
