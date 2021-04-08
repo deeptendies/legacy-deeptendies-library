@@ -6,7 +6,7 @@ import os
 import shutil	
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 from tensorflow.keras.layers.experimental.preprocessing import Normalization
-from google.colab import drive
+# from google.colab import drive
 
 
 class Trainer():
@@ -41,7 +41,7 @@ class Trainer():
         fig.show()
 
     def save_model(self):
-        drive.mount('/content/drive')
+        # drive.mount('/content/drive')
         self.model.save(self.model_name) 
         os.listdir()
         for f in os.listdir(): 
