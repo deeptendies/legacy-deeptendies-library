@@ -11,18 +11,30 @@ from tensorflow.keras.layers.experimental.preprocessing import Normalization
 class Trainer():
     """Trainer for model. 
     """
-    def __init__(self, save_location, model, model_name):
+#     def __init__(self, save_location, model, model_name):
+#         self.dir_location = save_location
+#         self.model = model
+#         self.model_name = model_name
+
+#     def split_data(self, X_dev, Y_dev, train_size):
+#         print("SPLITING DATA SET")
+#         self.X_train, self.X_val, self.Y_train, self.Y_val = train_test_split(X_dev, Y_dev, train_size=train_size)
+
+#     def train_model(self, batch_size, epochs, verbose, callbacks):
+#         print("TRAINING")
+#         self.model.fit(self.X_train, self.Y_train, batch_size, epochs, verbose, callbacks, validation_data=(self.X_val, self.Y_val))
+#         self.graph_results()
+        
+    def __init__(self, save_location, model, model_name, train_data, test_data):
         self.dir_location = save_location
         self.model = model
         self.model_name = model_name
+        self.train_data = train_data
+        self.test_data = test_data
 
-    def split_data(self, X_dev, Y_dev, train_size):
-        print("SPLITING DATA SET")
-        self.X_train, self.X_val, self.Y_train, self.Y_val = train_test_split(X_dev, Y_dev, train_size=train_size)
-
-    def train_model(self, batch_size, epochs, verbose, callbacks):
+    def train_model(self, epochs, verbose, callbacks ):
         print("TRAINING")
-        self.model.fit(self.X_train, self.Y_train, batch_size, epochs, verbose, callbacks, validation_data=(self.X_val, self.Y_val))
+        self.model.fit(self.train_data, steps_per_epoch=len(self.train_data), epochs=epochs, verbose=verbose, callbacks=callbacks)
         self.graph_results()
 
     def graph_results(self):
