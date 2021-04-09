@@ -8,22 +8,33 @@ Author-email: deeptendies@deeptendies.github.io
 License: UNKNOWN
 Project-URL: Bug Tracker, https://github.com/deeptendies/deeptendies/issues
 Description: # What is deeptendies
-        currently deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering.
+        currently deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering. We are bringing quantitative trading to the massses! Power to the players!
         
         # Installation
         ## mac & linux
-        fresh install
         ```
-        git clone https://github.com/deeptendies/deeptendies.git && cd deeptendies && python setup.py install
+        # install dependencies
+        pip install -r https://raw.githubusercontent.com/deeptendies/deeptendies/master/requirements.txt
+        # install deeptendies
+        pip install git+https://github.com/deeptendies/deeptendies
         ```
-        experimental (not working atm)
+        one line
         ```
-        pip install git+https://github.com/deeptendies/deeptendies#egg=deeptendies
+        pip install -r https://raw.githubusercontent.com/deeptendies/deeptendies/master/requirements.txt && pip install git+https://github.com/deeptendies/deeptendies
         ```
-        get updates
+        
+        reinstall
         ```
-        pip uninstall -y deeptendies && python setup.py install
+        pip uninstall deeptendies && pip install git+https://github.com/deeptendies/deeptendies
         ```
+        
+        ## windows
+        ```
+        git clone https://github.com/deeptendies/deeptendies.git
+        cd deeptendies
+        python setup.py install
+        ```
+        
         
         
 Platform: UNKNOWN
