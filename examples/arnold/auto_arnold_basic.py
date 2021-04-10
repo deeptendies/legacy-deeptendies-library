@@ -30,8 +30,8 @@ data_y = data_train[target_col].astype('float64')
 
 data_y_val = validation_data[target_col].astype('float64')
 
-print(data_x.shape)
-print(data_y.shape)
+print(f"data_x.shape: {data_x.shape}, data_y.shape: {data_y.shape}")
+print(f"data_x_val.shape: {data_x_val.shape}, data_y_val.shape: {data_y_val.shape}, data_x_test.shape: {data_x_test.shape}")
 
 """
 The second step is to run the [TimeSeriesForecaster](/time_series_forecaster).
