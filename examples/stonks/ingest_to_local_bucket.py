@@ -12,7 +12,5 @@ today = date.today()
 ticker = 'GME'
 days = 180
 
-stonk = StockData(ticker, days=days, api_key="c1h8m1n48v6t9ghtpkh0")
-stonk.df
 
 
