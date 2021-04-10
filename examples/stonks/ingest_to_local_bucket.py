@@ -1,76 +1,46 @@
 import os
 import pathlib
-from datetime import date
+import random
 
-from deeptendies.stock_data import StockData
+import numpy as np
+from datetime import date
+from pandas_datareader import data
+from deeptendies.utils.local_bucket import save_data
+
+# ingest data for final report
 
 today = date.today()
+start_date = '2011-04-01'
+end_date = '2021-04-01'
 
-# get api keys from here https://finnhub.io/dashboard
-# if dev or deployment, save a `secrets.yaml` in work dir
-# secrets.yaml example: https://raw.githubusercontent.com/deeptendies/deeptendies/master/secrets.yaml.example
-ticker = 'GME'
-days = 180
-
-stonk = StockData(ticker, days=days, api_key="c1h8m1n48v6t9ghtpkh0")
-stonk.df
+stonks = ["TSLA", "AAPL", "MSFT", "BA", "KO"]
 
 
-def df_to_filesys_operator(df, path, fname):
-    if not os.path.exists(path):
-        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-    df.to_csv(os.path.join(path, fname))
-    return
 
+yahoo_to_finnhub_header_map = {"Date": 't',
+                               "High": 'h',
+                               "Low": 'l',
+                               "Close": 'c',
+                               "Open": 'o',
+                               "Volume": 'v'}
 
-bucket = 'bucket=filesys'
-topic = 'topic=' + ticker
-processed_at = 'processed_at=' + today.strftime("%Y-%m-%d")
-version = 'raw'
-version = 'version=' + version
-filename = ticker + "_" + str(days) + '.csv'
+# load data with yahoo / data reader
+for ticker in stonks:
+    print(ticker, start_date, end_date)
+    candle_stick_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
+    save_data(dataframe=candle_stick_data,
+              bucket='fs',
+              topic=ticker,
+              version='yahoo',
+              suffix=f"{start_date}_to_{end_date}",
+              path="/home/stan/github/deeptendies")
 
-# raw
-path = os.path.join(
-    bucket,
-    topic,
-    version,
-    processed_at
-)
+    candle_stick_data = candle_stick_data.reset_index().rename(columns=yahoo_to_finnhub_header_map)
 
-df_to_filesys_operator(stonk.df,
-                       path,
-                       filename)
-
-version = 'feature_engineered'
-version = 'version=' + version
-# engineer features
-stonk.engineer_features()
-path = os.path.join(
-    bucket,
-    topic,
-    version,
-    processed_at
-)
-df_to_filesys_operator(stonk.df,
-                       path,
-                       filename)
-
-# clean dataframe
-drop_cols = ['next_1_high', 'next_1_low', 'next_3_high', 'next_3_low', 'next_5_high',
-             'next_5_low', 'next_7_high', 'next_7_low', 'last_1_high', 'last_1_low',
-             'last_3_high', 'last_3_low', 'last_5_high', 'last_5_low', 'last_7_high',
-             'last_7_low', "s", "wma"]
-df = stonk.get_cleaned_data(drop_cols=drop_cols)
-
-version = 'cleaned'
-version = 'version=' + version
-path = os.path.join(
-    bucket,
-    topic,
-    version,
-    processed_at
-)
-df_to_filesys_operator(df,
-                       path,
-                       filename)
+    print(candle_stick_data)
+    save_data(dataframe=candle_stick_data,
+              bucket='fs',
+              topic=ticker,
+              version='finnhub',
+              suffix=f"{start_date}_to_{end_date}",
+              path="/home/stan/github/deeptendies")
