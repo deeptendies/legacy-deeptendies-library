@@ -1,5 +1,7 @@
+Bringing quantitative trading to the massses!
+
 # What is deeptendies
-currently deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering. We are bringing quantitative trading to the massses! Power to the players!
+Deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering. We are bringing quantitative trading to the massses! Power to the players!
 
 # Installation
 ## mac & linux
