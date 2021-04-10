@@ -9,7 +9,7 @@ import warnings
 
 from sklearn.preprocessing import MinMaxScaler
 
-from deeptendies.utils import get_numerical_df
+from src.deeptendies.utils import get_numerical_df
 
 warnings.filterwarnings('ignore')
 import tensorflow as tf
@@ -20,9 +20,18 @@ from tensorflow.keras.layers import LSTM
 
 # to get started developing your own arnold, clone this starter file, rename
 # it as a new file, following mike's naming convention arnold_<model name>_<extra tag>.py
-fdir, fname = 'temp', 'interm_data.csv'
-file = os.path.join(fdir, fname)
-df = pd.read_csv(file, header=0, index_col=0)
+
+file = '../bucket=fs/topic=AAPL/version=demo/processed_at=2021-04-10/AAPL_2011-04-01_to_2021-04-01.csv'
+df = pd.read_csv(file, header=0)
+
+yahoo_to_finnhub_header_map = {"Date": 't',
+                  "High":'h',
+                  "Low" : 'l',
+                  "Close":'c',
+                  "Volume": 'v'} # adj close not used in finnhub
+df = df.rename(columns=yahoo_to_finnhub_header_map).set_index('t')
+print(df.head())
+
 df = get_numerical_df(df)
 
 split = int(0.8 * df.shape[1])
