@@ -30,6 +30,14 @@ class Trainer():
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
 
+    def get_predictions(self):
+        self.predictions = {'actual': [], "predicted": []}
+        idx= 0 
+        for i in self.test_data: 
+          self.predictions['actual'].append(self.test_data.unnormalize_target(i[1], idx=idx)[0])
+          self.predictions['predicted'].append(self.test_data.unnormalize_target(self.model.predict(i[0])[0], idx=idx)[0])
+          idx = idx + 1
+        
     def save_model_collab(self):
         """INTENDED FOR COLLAB ONLY"""
         drive.mount('/content/drive')
