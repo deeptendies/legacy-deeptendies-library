@@ -101,12 +101,15 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         return (self.end_index - self.start_index +
                 self.batch_size * self.stride) // (self.batch_size * self.stride)
 
-    def __getitem__(self, index, scale=True, min_max_scaler = True):
+    def __getitem__(self, index, scale=True, min_max_scaler = True, target_idx = 3):
       """Gets next batch sample and targets
+
+      Any columns at index < target_idx will not be scaled. Any columns at indices >= target_idx will be normalized.  
       Params: 
         index: Index to retrieve
         scale: boolean, if True, apply windowed normalization. 
         min_max_scaler: boolean, if True, use min max scaler, else, use standard scaler.
+        target_idx: index of target column, and columns with index < target will not be normalized. Any columns at index > target_idx will be normalized
       """
       if self.shuffle:
           rows = np.random.randint(
@@ -121,14 +124,15 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
       targets = np.array([self.targets[row] for row in rows])
 
       if scale: 
-        samples, targets = self.normalizer(samples, targets, index, min_max_scaler)            
+        samples, targets = self.normalizer(samples, targets, index, min_max_scaler, target_idx = target_idx)            
 
       if self.reverse:
           return samples[:, ::-1, ...], targets
       return samples, targets
 
-    def normalizer(self, samples, targets, idx, min_max_scaler, target_idx = 3):
+    def normalizer(self, samples, targets, idx, min_max_scaler=True, target_idx = 3):
       """helper to perform windowed min/max scaling
+      
       Params: 
         idx: index of sample 
         target_idx: column index of target vector 
@@ -147,8 +151,8 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         else: 
           scaler = StandardScaler()
           target_scaler = StandardScaler()
-        target_scaler.fit(samples[sample_idx][:,3].reshape(-1,1))
-        samples[sample_idx][:, 3:] = scaler.fit_transform(samples[sample_idx][:, 3:])
+        target_scaler.fit(samples[sample_idx][:,target_idx].reshape(-1,1))
+        samples[sample_idx][:, target_idx:] = scaler.fit_transform(samples[sample_idx][:, target_idx:])
         targets[sample_idx] = target_scaler.transform(targets[sample_idx].reshape(1, -1))
         scaler_list.append(scaler)
         target_scaler_list.append(target_scaler)
