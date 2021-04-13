@@ -17,18 +17,18 @@ class Trainer():
         self.model_name = model_name
         self.train_data = train_data
         self.test_data = test_data
+        self.hist = None
 
     def train_model(self, epochs, verbose, callbacks ):
         print("TRAINING")
         self.hist = self.model.fit(self.train_data, steps_per_epoch=len(self.train_data), epochs=epochs, verbose=verbose, callbacks=callbacks)
-        self.graph_loss()
-
     def graph_loss(self):
         loss = self.hist.history['loss']
-        plt.plot(self.hist.epoch, loss)
+        fig = plt.plot(self.hist.epoch, loss)
         plt.title("Loss vs. Epoch")
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
+        return fig 
 
     def get_predictions(self):
         self.predictions = {'actual': [], "predicted": []}
