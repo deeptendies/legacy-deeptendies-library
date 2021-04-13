@@ -117,9 +117,9 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         min_max_scaler: boolean, if True, use min max scaler, else, use standard scaler.
         target_idx: index of target column, and columns with index < target will not be normalized. Any columns at index > target_idx will be normalized
       """
-      target_idx = target_idx.self
-      mask = mask.self
-      mask_idx = mask_idx.self
+      target_idx = self.target_idx
+      mask = self.mask
+      mask_idx = self.mask_idx
       if self.shuffle:
           rows = np.random.randint(
               self.start_index, self.end_index + 1, size=self.batch_size)
