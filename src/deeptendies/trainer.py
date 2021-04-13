@@ -22,6 +22,7 @@ class Trainer():
     def train_model(self, epochs, verbose, callbacks ):
         print("TRAINING")
         self.hist = self.model.fit(self.train_data, steps_per_epoch=len(self.train_data), epochs=epochs, verbose=verbose, callbacks=callbacks)
+    
     def graph_loss(self):
         loss = self.hist.history['loss']
         fig = plt.plot(self.hist.epoch, loss)

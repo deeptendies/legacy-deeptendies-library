@@ -12,21 +12,27 @@ class ModelResultPlots:
     reuse code needed for model result plots
     """
     @staticmethod
-    def plot_predicted_vs_original_price(y_test, y_prediction, stock_name):
-        """
-        Plots real vs. predicted stock price
-        Params:
-            y_test: test data array
-            y_prediction: predicted prices array
-            stock_name: stock name as a string
-        Returns:
-            displays plot
-        """
-        plt.figure(figsize=(10 , 10))
-        plt.plot(y_test, label = 'Real ' + stock_name + ' stock price')
-        plt.plot(y_prediction, label = 'Predicted ' + stock_name + ' stock price')
-        plt.legend(loc='upper right')
-        plt.show()
+    def plot_predicted_vs_original_price(y_test, y_prediction, stock_name, days, x_step = 150):
+            """
+            Plots real vs. predicted stock price
+            Params:
+                y_test: test data array
+                y_prediction: predicted prices array
+                stock_name: stock name as a string
+                days: list<string>: dates to plot 
+                x_steps: Days to 
+            Returns:
+                displays plot
+            """           
+            fig, ax = plt.subplots(figsize=(24,18))
+            ax.plot(days, y_test, label = 'Real ' + stock_name + ' stock price')
+            ax.plot(days, y_prediction, label = 'Predicted ' + stock_name + ' stock price')
+            plt.xticks(range(0,len(days),x_step), days[::x_step],rotation=45)
+            plt.xlabel('Date',fontsize=24)
+            plt.ylabel('Closing Price',fontsize=24)
+            plt.title(f"{stock_name} Closing Price vs. Date", fontsize=36)
+            plt.legend(loc='upper right')
+            return fig 
 
     @staticmethod
     def plot_loss(history, train_metric_name, val_metric_name, title, ylabel, xlabel = "Epoch"):
