@@ -12,7 +12,7 @@ class ModelResultPlots:
     reuse code needed for model result plots
     """
     @staticmethod
-    def plot_predicted_vs_original_price(y_test, y_prediction, stock_name, days, x_step = 150):
+    def plot_predicted_vs_original_price(y_test, y_prediction, stock_name, days, x_step = 150, title = "Closing Price vs. Date", predicted_value_name = "stock price"):
             """
             Plots real vs. predicted stock price
             Params:
@@ -25,12 +25,12 @@ class ModelResultPlots:
                 displays plot
             """           
             fig, ax = plt.subplots(figsize=(24,18))
-            ax.plot(days, y_test, label = 'Real ' + stock_name + ' stock price')
-            ax.plot(days, y_prediction, label = 'Predicted ' + stock_name + ' stock price')
+            ax.plot(days, y_test, label = f"Real {stock_name} {predicted_value_name}")
+            ax.plot(days, y_prediction, label = f"Predicted {stock_name} {predicted_value_name}")
             plt.xticks(range(0,len(days),x_step), days[::x_step],rotation=45)
             plt.xlabel('Date',fontsize=24)
             plt.ylabel('Closing Price',fontsize=24)
-            plt.title(f"{stock_name} Closing Price vs. Date", fontsize=36)
+            plt.title(f"{stock_name} {title}", fontsize=36)
             plt.legend(loc='upper right')
             return fig 
 
