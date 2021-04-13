@@ -71,7 +71,8 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
                  batch_size=128,
                  target_idx = 3, 
                  mask = False,
-                 mask_idx = 5):
+                 mask_idx = 5,
+                 min_max_scaler=True) :
 
         if len(data) != len(targets):
             raise ValueError('Data and targets have to be' +
@@ -96,6 +97,7 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         self.mask = mask
         self.mask_idx = mask_idx
         self.target_idx = target_idx 
+        self.min_max_scaler = min_max_scaler
 
         if self.start_index > self.end_index:
             raise ValueError('`start_index+length=%i > end_index=%i` '
@@ -107,7 +109,7 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         return (self.end_index - self.start_index +
                 self.batch_size * self.stride) // (self.batch_size * self.stride)
 
-    def __getitem__(self, index, scale=True, min_max_scaler = True):
+    def __getitem__(self, index, scale=True):
       """Gets next batch sample and targets
 
       Any columns at index < target_idx will not be scaled. Any columns at indices >= target_idx will be normalized.  
@@ -120,6 +122,9 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
       target_idx = self.target_idx
       mask = self.mask
       mask_idx = self.mask_idx
+      min_max_scaler = self.min_max_scaler
+
+
       if self.shuffle:
           rows = np.random.randint(
               self.start_index, self.end_index + 1, size=self.batch_size)

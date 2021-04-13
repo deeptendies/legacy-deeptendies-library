@@ -349,7 +349,11 @@ class StockData():
         length=length, 
         batch_size=batch_size,
         start_index =0,
-        end_index = train_idx-1
+        end_index = train_idx-1, 
+        mask = mask, 
+        mask_idx = mask_idx, 
+        target_idx = target_idx
+
       )
 
       testGen = WindowNormTimeseriesGenerator(
@@ -357,7 +361,10 @@ class StockData():
           df[target_col].values,
           length=length, 
           batch_size=batch_size,
-          start_index =train_idx
+          start_index =train_idx,
+          mask = mask, 
+          mask_idx = mask_idx, 
+          target_idx = target_idx
       )
     else: 
       trainGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
