@@ -410,7 +410,7 @@ class StockData():
       leg = plt.legend()
       return fig
 
-  def get_next_day_high_plot(self, df=None, day=5, title = "Next 5 Day High Closing Price vs. Date", x_step = 365):
+  def get_next_high_low_plot(self, df=None, day=5, title = "Next 5 Day High/Low and Closing Price vs. Date", x_step = 365):
       """Gets line plot for a standard finnhub df
       Params: 
       df: df to plot
@@ -421,21 +421,21 @@ class StockData():
       plt.fig instance
       """
       pass 
-      # if df == None: 
-      #   df = self.df
-      # fig, ax = plt.subplots(figsize=(24,18))
-      # ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
-      # if plot_features: 
-      #     features = ['100wma', '100mvwap', '50wma', '50mvwap', '20wma', '20mvwap']
-      #     colors = ['firebrick', 'navy', 'red', 'blue', 'salmon', 'cornflowerblue']
-      #     for feature, color in zip(features, colors): 
-      #         ax.plot(range(df.shape[0]), df[feature].values, label=feature, c=color)
-      # plt.xticks(range(0,df.shape[0],x_step),df.index[::x_step],rotation=45)
-      # plt.xlabel('Date',fontsize=24)
-      # plt.ylabel('Mid Price',fontsize=24)
-      # plt.title(title, fontsize=36)
-      # leg = plt.legend()
-      # return fig
+      if df == None: 
+        df = self.df
+      fig, ax = plt.subplots(figsize=(24,18))
+      ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
+      if plot_features: 
+          features = ['next_5_high', 'next_5_low']
+          colors = ['red', 'blue']
+          for feature, color in zip(features, colors): 
+              ax.plot(range(df.shape[0]), df[feature].values, label=feature, c=color)
+      plt.xticks(range(0,df.shape[0],x_step),df.index[::x_step],rotation=45)
+      plt.xlabel('Date',fontsize=24)
+      plt.ylabel('Mid Price',fontsize=24)
+      plt.title(title, fontsize=36)
+      leg = plt.legend()
+      return fig
 
 
 
