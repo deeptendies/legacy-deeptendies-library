@@ -324,7 +324,7 @@ class StockData():
     return train_idx, len(df) - train_idx
 
   @staticmethod
-  def get_timeseries_generators(df, test_percentage=0.3, target_col="c", length = 100, batch_size=1, windowed_norm = False, min_max_scaler=False): 
+  def get_timeseries_generators(df, test_percentage=0.3, target_col="c", length = 100, batch_size=1, windowed_norm = False, min_max_scaler=False,  mask = True,  mask_idx = 5, target_idx = 3): 
     """Get train/test generators
 
       Similar to: https://jackdry.com/using-an-lstm-based-model-to-predict-stock-returns
