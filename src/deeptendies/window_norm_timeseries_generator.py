@@ -68,7 +68,10 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
                  end_index=None,
                  shuffle=False,
                  reverse=False,
-                 batch_size=128):
+                 batch_size=128,
+                 target_idx = 3, 
+                 mask = False,
+                 mask_idx = 5):
 
         if len(data) != len(targets):
             raise ValueError('Data and targets have to be' +
@@ -90,6 +93,9 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         self.batch_size = batch_size
         self.target_scalers = {}
         self.scalers = {}
+        self.mask = mask
+        self.mask_idx = mask_idx
+        self.target_idx = target_idx 
 
         if self.start_index > self.end_index:
             raise ValueError('`start_index+length=%i > end_index=%i` '
@@ -101,7 +107,7 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         return (self.end_index - self.start_index +
                 self.batch_size * self.stride) // (self.batch_size * self.stride)
 
-    def __getitem__(self, index, scale=True, min_max_scaler = True, target_idx = 3, mask=False, mask_idx = 5):
+    def __getitem__(self, index, scale=True, min_max_scaler = True):
       """Gets next batch sample and targets
 
       Any columns at index < target_idx will not be scaled. Any columns at indices >= target_idx will be normalized.  
@@ -111,6 +117,9 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         min_max_scaler: boolean, if True, use min max scaler, else, use standard scaler.
         target_idx: index of target column, and columns with index < target will not be normalized. Any columns at index > target_idx will be normalized
       """
+      target_idx = target_idx.self
+      mask = mask.self
+      mask_idx = mask_idx.self
       if self.shuffle:
           rows = np.random.randint(
               self.start_index, self.end_index + 1, size=self.batch_size)
@@ -144,6 +153,8 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         samples: sample array
         targets: target array
       """
+
+      ## TODO: Fix target_idx to pull from class attribute
       sample_idx = 0 
       scaler_list = []
       target_scaler_list = []
