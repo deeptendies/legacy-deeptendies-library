@@ -101,7 +101,7 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
         return (self.end_index - self.start_index +
                 self.batch_size * self.stride) // (self.batch_size * self.stride)
 
-    def __getitem__(self, index, scale=True, min_max_scaler = True, target_idx = 3):
+    def __getitem__(self, index, scale=True, min_max_scaler = True, target_idx = 3, mask=False, mask_idx = 5):
       """Gets next batch sample and targets
 
       Any columns at index < target_idx will not be scaled. Any columns at indices >= target_idx will be normalized.  
@@ -121,6 +121,9 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
 
       samples = np.array([self.data[row - self.length:row:self.sampling_rate]
                           for row in rows])
+      if mask: 
+          samples[0][-mask_idx:][:,target_idx] = np.repeat(samples[0][self.length-mask_idx-1][3], mask_idx)
+
       targets = np.array([self.targets[row] for row in rows])
 
       if scale: 
