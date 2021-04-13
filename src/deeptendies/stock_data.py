@@ -410,7 +410,7 @@ class StockData():
       leg = plt.legend()
       return fig
 
-  def get_next_high_low_plot(self, df=None, day=5, title = "Next 5 Day High/Low and Closing Price vs. Date", x_step = 365):
+  def get_next_high_low_plot(self, use_custom_df = False, df=None, title = "Next 5 Day High/Low and Closing Price vs. Date", x_step = 365):
       """Gets line plot for a standard finnhub df
       Params: 
       df: df to plot
@@ -420,8 +420,7 @@ class StockData():
       Returns:
       plt.fig instance
       """
-      pass 
-      if df == None: 
+      if not use_custom_df: 
         df = self.df
       fig, ax = plt.subplots(figsize=(24,18))
       ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
