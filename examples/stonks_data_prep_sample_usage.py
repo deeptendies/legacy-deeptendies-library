@@ -1,18 +1,15 @@
 # sudo apt-get install python3-tk
 import os
-import time
-
 import yaml
-from deeptendies import *
+from deeptendies.stonks import *
 import pandas as pd
 # base configs
+from deeptendies.stonks import get_enriched_stock_data
+from deeptendies.utils import generate_time_fields
 
 
 # just an example, use generated key from https://finnhub.io/dashboard
 # finnhub_token = "c1c318v48v6sp0s58ffg"
-from deeptendies.stonks import get_stock_data, get_enriched_stock_data, get_high, get_low, add_vwap_col, \
-    get_moving_average, get_calendar_features
-from deeptendies.utils import generate_time_fields
 
 credentials='/home/stan/github/mltrade/secrets.yaml'
 # load secrets from yaml example:

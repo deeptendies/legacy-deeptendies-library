@@ -24,6 +24,7 @@ import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 import yaml 
 import os
+from deeptendies.window_norm_timeseries_generator import WindowNormTimeseriesGenerator
 
 # from deeptendies.utils import generate_time_fields, rename_reference_df_column_names, merge_dfs
 
@@ -223,8 +224,7 @@ class StockData():
     Returns:
       Updated df with new column name = "<window>_wma" where window = number of time steps, eg., 100_wma
     """
-    # TODO: Fix trailing and leading NaN
-    # weights = np.arange(window, 0, -1)
+    # TODO: Fix trailing NaN
     weights = np.arange(1, window+1, 1)
     sum_weights = np.sum(weights)
     col_name = str(window) + "wma"
@@ -249,7 +249,7 @@ class StockData():
 
   def get_high(self, df_new, days):
       for i in days:
-          df_new['next_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(-i).fillna(np.nan) #TODO: Try out other imputation method
+          df_new['next_'+str(i)+'_high']=df_new['h'].rolling(window=i).max().shift(-i).fillna(np.nan) #TODO: Try out other imputation methods?
           df_new['next_'+str(i)+'_low']=df_new['l'].rolling(window=i).min().shift(-i).fillna(np.nan) 
       return df_new
 
@@ -262,7 +262,7 @@ class StockData():
 
 
   def get_enriched_stock_data(self, df, stock_name, days, period, finnhub_api_key):
-    # TODO: Incorporate into class. Talk to stan about goals here (reimport, re-feature engineer?)
+    # TODO: Incorporate into class. Talk to stan about goals here (reimport, re-feature engineer?) Not tested. 
       """
       combines old df with new data from api call and then merge them together
 
@@ -324,7 +324,7 @@ class StockData():
     return train_idx, len(df) - train_idx
 
   @staticmethod
-  def get_timeseries_generators(df, test_percentage=0.3, target_col="c", length = 100, batch_size=1): 
+  def get_timeseries_generators(df, test_percentage=0.3, target_col="c", length = 100, batch_size=1, windowed_norm = False, min_max_scaler=False,  mask = True,  mask_idx = 5, target_idx = 3): 
     """Get train/test generators
 
       Similar to: https://jackdry.com/using-an-lstm-based-model-to-predict-stock-returns
@@ -335,31 +335,56 @@ class StockData():
         target_col = name of column for target
         length = rolling window length to consider (eg., 100 days)
         batch_size = batch size for generator
+        windowed_norm = if True, return generators with window wise normalization
+        min_max_scaler = if true && window_norm, return min_max scaled window wise normalization. If false, return standard scaler normalization. 
       
       Returns: 
         (trainGen, testGen) = tf.keras.preprocessing.sequence.TimeseriesGenerator objects, one for training, one for testing. 
     """
     train_idx, test_idx = StockData.get_train_test_split(df, test_percentage)
-    print(train_idx, test_idx)
-    trainGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
+    if windowed_norm: 
+      trainGen = WindowNormTimeseriesGenerator(
         df.values, 
         df[target_col].values,
         length=length, 
         batch_size=batch_size,
         start_index =0,
-        end_index = train_idx-1
-    )
+        end_index = train_idx-1, 
+        mask = mask, 
+        mask_idx = mask_idx, 
+        target_idx = target_idx
 
-    testGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
-        df.values, 
-        df[target_col].values,
-        length=length, 
-        batch_size=batch_size,
-        start_index =train_idx
-    )
+      )
+
+      testGen = WindowNormTimeseriesGenerator(
+          df.values, 
+          df[target_col].values,
+          length=length, 
+          batch_size=batch_size,
+          start_index =train_idx,
+          mask = mask, 
+          mask_idx = mask_idx, 
+          target_idx = target_idx
+      )
+    else: 
+      trainGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
+          df.values, 
+          df[target_col].values,
+          length=length, 
+          batch_size=batch_size,
+          start_index =0,
+          end_index = train_idx-1
+      )
+      testGen = tf.keras.preprocessing.sequence.TimeseriesGenerator(
+          df.values, 
+          df[target_col].values,
+          length=length, 
+          batch_size=batch_size,
+          start_index =train_idx
+      )
     return trainGen, testGen
 
-  def get_line_plot(self, df=None, title = "Closing Price vs. Date", x_step = 365, plot_features=True):
+  def get_line_plot(self, use_custom_df = False, df=None, title = "Closing Price vs. Date", x_step = 365, plot_features=True):
       """Gets line plot for a standard finnhub df
       Params: 
       df: df to plot
@@ -369,7 +394,7 @@ class StockData():
       Returns:
       plt.fig instance
       """
-      if df == None: 
+      if not use_custom_df: 
         df = self.df
       fig, ax = plt.subplots(figsize=(24,18))
       ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
@@ -378,6 +403,31 @@ class StockData():
           colors = ['firebrick', 'navy', 'red', 'blue', 'salmon', 'cornflowerblue']
           for feature, color in zip(features, colors): 
               ax.plot(range(df.shape[0]), df[feature].values, label=feature, c=color)
+      plt.xticks(range(0,df.shape[0],x_step),df.index[::x_step],rotation=45)
+      plt.xlabel('Date',fontsize=24)
+      plt.ylabel('Mid Price',fontsize=24)
+      plt.title(title, fontsize=36)
+      leg = plt.legend()
+      return fig
+
+  def get_next_high_low_plot(self, use_custom_df = False, df=None, title = "Next 5 Day High/Low and Closing Price vs. Date", x_step = 365):
+      """Gets line plot for a standard finnhub df
+      Params: 
+      df: df to plot
+      title: name of plot
+      x_step: number of time steps to print on x axis (ie., x_steps per tick). Note that buisness days only ploted! 
+      plot_features <bool>: true if you want to see the mva and mvwap overlaid
+      Returns:
+      plt.fig instance
+      """
+      if not use_custom_df: 
+        df = self.df
+      fig, ax = plt.subplots(figsize=(24,18))
+      ax.plot(range(df.shape[0]),(df['c']), linewidth=5.0, label="Close", c='black')
+      features = ['next_5_high', 'next_5_low']
+      colors = ['red', 'blue']
+      for feature, color in zip(features, colors): 
+          ax.plot(range(df.shape[0]), df[feature].values, label=feature, c=color)
       plt.xticks(range(0,df.shape[0],x_step),df.index[::x_step],rotation=45)
       plt.xlabel('Date',fontsize=24)
       plt.ylabel('Mid Price',fontsize=24)

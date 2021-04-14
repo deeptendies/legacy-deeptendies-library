@@ -1,11 +1,17 @@
 README.md
 setup.py
 src/deeptendies/__init__.py
+src/deeptendies/model_metrics.py
 src/deeptendies/plots.py
+src/deeptendies/result_plots.py
 src/deeptendies/stock_data.py
 src/deeptendies/stonks.py
+src/deeptendies/trainer.py
 src/deeptendies/utils.py
+src/deeptendies/window_norm_timeseries_generator.py
 src/deeptendies.egg-info/PKG-INFO
 src/deeptendies.egg-info/SOURCES.txt
 src/deeptendies.egg-info/dependency_links.txt
 src/deeptendies.egg-info/top_level.txt
+src/deeptendies/bucket/__init__.py
+src/deeptendies/bucket/local_bucket.py
