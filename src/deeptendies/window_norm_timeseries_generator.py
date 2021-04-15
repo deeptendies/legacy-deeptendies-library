@@ -136,7 +136,7 @@ class WindowNormTimeseriesGenerator(TimeseriesGenerator):
       samples = np.array([self.data[row - self.length:row:self.sampling_rate]
                           for row in rows])
       if mask: 
-          samples[0][-mask_idx:][:,target_idx] = np.repeat(samples[0][self.length-mask_idx-1][3], mask_idx)
+          samples[0][-mask_idx:][:,target_idx] = np.repeat(samples[0][self.length-mask_idx-1][target_idx], mask_idx)
 
       targets = np.array([self.targets[row] for row in rows])
 
