@@ -1,6 +1,11 @@
 # What is deeptendies
 Deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering. We are bringing quantitative trading to the massses! Power to the players!
 
+# Repo Structure
+Please see `./src/deeptendies/` for core package components. 
+
+See `/notebooks/` for notebooks used to prepare final report and presentation. 
+
 # Installation
 ## mac & linux
 ```
