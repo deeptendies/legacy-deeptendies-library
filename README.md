@@ -1,5 +1,6 @@
 # What is deeptendies
-Deeptendies is an open source package to get stonks data. Enrich via get high and get low, and perform feature memegineering. We are bringing quantitative trading to the massses! Power to the players!
+deeptendies is an [open source](https://github.com/open-source) package to bring ML and quant analysis tools and 
+> power to the players! 
 
 # Repo Structure
 Please see `./src/deeptendies/` for core package components. 
@@ -31,4 +32,18 @@ cd deeptendies
 python setup.py install
 ```
 
+# Official Channels
+- [r/deeptendies](https://www.reddit.com/r/deeptendies/)
+- [github.com/deeptendies](https://github.com/deeptendies)
+
+
+# Disclaimer of Warranty.
+> There is no warranty for the program, to the extent permitted by
+Applicable law.  Except when otherwise stated in writing the copyright
+Holders and/or other parties provide the program "As is" without warranty
+Of any kind, either expressed or implied, including, but not limited to,
+The implied warranties of merchantability and fitness for a particular
+Purpose.  The entire risk as to the quality and performance of the program
+Is with you.  Should the program prove defective, you assume the cost of
+All necessary servicing, repair or correction. (https://github.com/deeptendies/deeptendies/blob/master/LICENSE)
 
