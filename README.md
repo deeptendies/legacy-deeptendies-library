@@ -7,6 +7,9 @@ Please see `./src/deeptendies/` for core package components.
 
 See `/notebooks/` for notebooks used to generate data in report. 
 
+# Onboarding
+https://github.com/deeptendies/deeptendies/wiki/Onboarding
+
 # Installation
 ## mac & linux
 ```
