@@ -1,0 +1,5 @@
+technical_indicators:
+  owners:
+    - "@deeptendies/data-engineering"
+    - "@tongxu95"
+  path: "src/deeptendies/technical_indicators"
