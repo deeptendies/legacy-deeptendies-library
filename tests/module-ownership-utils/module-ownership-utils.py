@@ -10,7 +10,6 @@ with open(r'module-owners.yaml') as file:
 
 # get to the root path of this project ( from child dir)
 path = os.path.dirname(os.path.abspath(__file__))
-levels_to_search = 3
 file_to_search = "setup.py"
 while file_to_search not in os.listdir(path):
     # if path == os.path.dirname(path):

@@ -3,13 +3,12 @@ matplotlib
 seaborn
 pandas_datareader
 sklearn
-numpy
+numpy==1.20.0
 keras
 tensorflow
 plotly
 finnhub-python
 statsmodels
 autokeras
-
 # can be depreciated
 see_rnn
